@@ -7,6 +7,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.genx.app.api.JokeService;
@@ -21,6 +22,7 @@ import rx.schedulers.Schedulers;
 public class MainActivity extends AppCompatActivity {
 
     private Retrofit retrofit;
+    private TextView tvText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        tvText = findViewById(R.id.tvText);
 
         retrofit = new Retrofit.Builder()
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
@@ -44,10 +47,10 @@ public class MainActivity extends AppCompatActivity {
 
         JokeService jokeService = retrofit.create(JokeService.class);
         Observable<Joke> randomJoke = jokeService.getRandomJoke();
-
         randomJoke.subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(joke -> {
+                    tvText.setText(joke.getValue());
                     Toast.makeText(MainActivity.this, "" + joke.getValue(), Toast.LENGTH_SHORT).show();
                 });
     }
